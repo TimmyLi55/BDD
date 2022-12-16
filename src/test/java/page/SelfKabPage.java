@@ -1,24 +1,28 @@
 package page;
 
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.Selectors;
 import com.codeborne.selenide.SelenideElement;
+import data.DataHelper;
 import lombok.val;
 
-import java.util.StringJoiner;
 
-import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.*;
 
 public class SelfKabPage {
-    public SelenideElement firstCard = $("[data-test-id=92df3f1c-a033-48e6-8390-206f6b1f56c0]");
-    public SelenideElement secondCard = $("[data-test-id=0f3f5c2a-249e-4c3d-8287-09f7a039391d]");
 
-    private SelenideElement buttonReload = $("data-test-id=action-reload");
-    private String stringBalanceStart = "баланс:";
-    private String stringBalanceFinish = "р.";
+    private SelenideElement buttonReload = $("[data-test-id=action-reload]");
+    private String stringBalanceStart = "баланс: ";
+    private String stringBalanceFinish = " р.";
+
+    private ElementsCollection cards = $$(".list__item div");
 
     public SelfKabPage reloadPage() {
         buttonReload.click();
         return this;
     }
+
 
     public int pickFromText(String text) {
         val start = text.indexOf(stringBalanceStart);
@@ -28,15 +32,14 @@ public class SelfKabPage {
 
     }
 
-    public int getCardBalance(SelenideElement card) {
-        val balance = card.text();
+    public int getCardBalance(DataHelper.CardNumbers dataCard) {
+        val balance = cards.findBy(Condition.attribute("data-test-id", dataCard.getIdCard())).text();
         return pickFromText(balance);
     }
 
-    public DepositsPage depositCard(SelenideElement card) {
-        card.$("button").click();
-        return new DepositsPage();
+    public DepositPage upBalanceCard (DataHelper.CardNumbers dataCard){
+        cards.findBy(Condition.attribute("data-test-id", dataCard.getIdCard())).$("button").click();
+        return new DepositPage();
     }
-
 
 }
